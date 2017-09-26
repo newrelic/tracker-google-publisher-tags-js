@@ -1,0 +1,31 @@
+{
+  "name": "newrelic-google-publisher-tag",
+  "version": "0.1.0",
+  "description": "New relic tracker for GPT",
+  "main": "src/index.js",
+  "scripts": {
+    "build": "webpack -p",
+    "build:dev": "webpack",
+    "watch": "webpack -p --progress --color --watch",
+    "watch:dev": "webpack --progress --color --watch",
+    "prezip": "npm run build",
+    "zip": "zip -P newrelic -x '*.DS_Store' 'agent.js' '*.map' -r gpt.zip dist samples README.md CHANGELOG.md EULA.md",
+    "clean": "rm -rf dist *.zip"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@source.datanerd.us:video/google-publisher-tag-js.git"
+  },
+  "author": "Jordi Aguilar",
+  "license": "MIT",
+  "dependencies": {
+    "newrelic-video-core": "https://source.datanerd.us/api/v3/repos/video/core-js/tarball/master?access_token=a0ffea13c434546f2378ab5244846bb1a3d0a690"
+  },
+  "devDependencies": {
+    "babel-core": "^6.25.0",
+    "babel-loader": "^7.1.1",
+    "babel-preset-env": "^1.6.0",
+    "videojs-ima": "^0.6.0",
+    "webpack": "^3.4.1"
+  }
+}
