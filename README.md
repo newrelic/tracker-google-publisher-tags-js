@@ -12,6 +12,7 @@ Just include the scripts inside `dist` folder to your page. See `sample` folder 
 ## Data Dictionary
 The following event names are sent by the tracker as Browser Agent `Custom Events`.
 
+* `SLOT_LOAD`: The slot has been loaded for the first time.
 * `SLOT_RENDERED`: The slot has been rendered for the first time.
 * `SLOT_VIEWABLE`: The slot is more than 50% viewable on the user screen.
 * `SLOT_HIDDEN`: The slot that previously fired a `SLOT_VIEWABLE` is no longer viewable (less than 50%).

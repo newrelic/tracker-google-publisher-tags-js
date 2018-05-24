@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## [0.3.0] - 2018/05/24
+### Add
+- `SLOT_LOAD` event.
+
 ## [0.2.0] - 2018/05/23
 ### Add
 - `SLOT_RENDERED` event.

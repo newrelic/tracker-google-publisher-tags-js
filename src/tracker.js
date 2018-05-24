@@ -121,6 +121,7 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
    */
   onSlotOnload (e) {
     nrvideo.Log.debug('onSlotOnload', e)
+    this.send('SLOT_LOAD', this.parseSlotAttributes(e.slot))    
   }
 
   /**
@@ -144,7 +145,7 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
         let att = this.parseSlotAttributes(e.slot)
         att.serviceName = e.serviceName
 
-        this.send('SLOT_VISIBLE', att)
+        this.send('SLOT_VIEWABLE', att)
 
         slotState.chrono.start()
         slotState.visible = true
