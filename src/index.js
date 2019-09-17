@@ -1,6 +1,8 @@
 import * as nrvideo from 'newrelic-video-core'
 import Tracker from './tracker'
 
+console.log('>>>>> INDEX <<<<<')
+
 nrvideo.GooglePublisherTagTracker = Tracker
 
 if (window.addEventListener) {

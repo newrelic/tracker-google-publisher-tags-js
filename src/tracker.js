@@ -22,6 +22,14 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
   }
 
   /**
+   * Overwrite "send" method of nrvideo.Tracker class.
+   */
+  send (event, att) {
+    nrvideo.Log.debug("#######> SEND EVENT = ", event, " ATT = ", att)
+    super.send(event, att)
+  }
+
+  /**
    * Returns tracker name.
    * @returns {String} Tracker name.
    */
@@ -57,7 +65,7 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
   parseSlotAttributes (slot) {
     let responseInfo = slot.getResponseInformation()
     return {
-      name: slot.getName(),
+      name: slot.getAdUnitPath(),
       slotId: slot.getSlotId().getId(),
       advertiserId: responseInfo.advertiserId,
       campaignId: responseInfo.campaignId,
@@ -89,7 +97,7 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
    * @param {Event} e
    */
   onSlotRenderEnded (e) {
-    nrvideo.Log.debug('onSlotRenderEnded', e)
+    //nrvideo.Log.debug('onSlotRenderEnded', e)
     this.send('SLOT_RENDERED', this.parseSlotAttributes(e.slot))
   }
 
@@ -98,7 +106,7 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
    * @param {Event} e
    */
   onImpressionViewable (e) {
-    nrvideo.Log.debug('onImpressionViewable', e)
+    //nrvideo.Log.debug('onImpressionViewable', e)
     if (e && e.slot) {
       let id = e.slot.getSlotId().getId()
       let slotState = this.getSlotState(id)
@@ -120,7 +128,7 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
    * @param {Event} e
    */
   onSlotOnload (e) {
-    nrvideo.Log.debug('onSlotOnload', e)
+    //nrvideo.Log.debug('onSlotOnload', e)
     this.send('SLOT_LOAD', this.parseSlotAttributes(e.slot))    
   }
 
@@ -129,7 +137,7 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
    * @param {Event} e
    */
   onSlotVisibilityChanged (e) {
-    nrvideo.Log.debug('onSlotVisibilityChanged', e)
+    //nrvideo.Log.debug('onSlotVisibilityChanged', e)
     if (e && e.slot) {
       let id = e.slot.getSlotId().getId()
       let slotState = this.getSlotState(id)
