@@ -88,6 +88,8 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
         pubads.addEventListener('impressionViewable', this.onImpressionViewable.bind(this))
         pubads.addEventListener('slotOnload', this.onSlotOnload.bind(this))
         pubads.addEventListener('slotVisibilityChanged', this.onSlotVisibilityChanged.bind(this))
+        pubads.addEventListener('slotRequestedEvent', this.onSlotRequestedEvent.bind(this))
+        pubads.addEventListener('slotResponseReceived', this.onSlotResponseReceived.bind(this))
       })
     }
   }
@@ -159,5 +161,23 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
         slotState.visible = true
       }
     }
+  }
+
+  /**
+   * Called once GPT fires 'onSlotRequestedEvent' event.
+   * @param {Event} e
+   */
+  onSlotRequestedEvent (e) {
+    //nrvideo.Log.debug('onSlotRequestedEvent', e)
+    this.send('SLOT_REQUESTED', this.parseSlotAttributes(e.slot))
+  }
+
+  /**
+   * Called once GPT fires 'onSlotResponseReceived' event.
+   * @param {Event} e
+   */
+  onSlotResponseReceived (e) {
+    //nrvideo.Log.debug('onSlotResponseReceived', e)
+    this.send('SLOT_RECEIVED', this.parseSlotAttributes(e.slot))
   }
 }
