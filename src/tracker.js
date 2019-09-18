@@ -70,6 +70,7 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
       advertiserId: responseInfo.advertiserId,
       campaignId: responseInfo.campaignId,
       creativeId: responseInfo.creativeId,
+      creativeTemplateId: responseInfo.creativeTemplateId,
       lineItemId: responseInfo.lineItemId,
       labelIds: responseInfo.labelIds,
       contentUrl: slot.getContentUrl(),
