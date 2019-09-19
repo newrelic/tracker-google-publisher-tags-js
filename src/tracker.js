@@ -21,12 +21,6 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
     this.slots = {}
   }
 
-  // TEST: to capture sends and print a log, REMOVE IT BEFORE GO PRODUCTION
-  send (event, att) {
-    console.log("#######> SEND EVENT = ", event, " ATT = ", att)
-    super.send(event, att)
-  }
-
   /**
    * Returns tracker name.
    * @returns {String} Tracker name.
