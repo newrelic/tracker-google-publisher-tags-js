@@ -21,11 +21,9 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
     this.slots = {}
   }
 
-  /**
-   * Overwrite "send" method of nrvideo.Tracker class.
-   */
+  // TEST: to capture sends and print a log, REMOVE IT BEFORE GO PRODUCTION
   send (event, att) {
-    nrvideo.Log.debug("#######> SEND EVENT = ", event, " ATT = ", att)
+    console.log("#######> SEND EVENT = ", event, " ATT = ", att)
     super.send(event, att)
   }
 
@@ -82,7 +80,7 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
    * Register listeners.
    */
   registerListeners () {
-    if (typeof googletag !== 'undefined') {
+    if (window.googletag && googletag.apiReady) {
       googletag.cmd.push(() => {
         let pubads = googletag.pubads()
         pubads.addEventListener('slotRenderEnded', this.onSlotRenderEnded.bind(this))
@@ -100,7 +98,7 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
    * @param {Event} e
    */
   onSlotRenderEnded (e) {
-    //nrvideo.Log.debug('onSlotRenderEnded', e)
+    nrvideo.Log.debug('onSlotRenderEnded', e)
     this.send('SLOT_RENDERED', this.parseSlotAttributes(e.slot))
   }
 
@@ -109,7 +107,7 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
    * @param {Event} e
    */
   onImpressionViewable (e) {
-    //nrvideo.Log.debug('onImpressionViewable', e)
+    nrvideo.Log.debug('onImpressionViewable', e)
     if (e && e.slot) {
       let id = e.slot.getSlotId().getId()
       let slotState = this.getSlotState(id)
@@ -131,7 +129,7 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
    * @param {Event} e
    */
   onSlotOnload (e) {
-    //nrvideo.Log.debug('onSlotOnload', e)
+    nrvideo.Log.debug('onSlotOnload', e)
     this.send('SLOT_LOAD', this.parseSlotAttributes(e.slot))    
   }
 
@@ -140,7 +138,7 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
    * @param {Event} e
    */
   onSlotVisibilityChanged (e) {
-    //nrvideo.Log.debug('onSlotVisibilityChanged', e)
+    nrvideo.Log.debug('onSlotVisibilityChanged', e)
     if (e && e.slot) {
       let id = e.slot.getSlotId().getId()
       let slotState = this.getSlotState(id)
@@ -169,7 +167,7 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
    * @param {Event} e
    */
   onSlotRequestedEvent (e) {
-    //nrvideo.Log.debug('onSlotRequestedEvent', e)
+    nrvideo.Log.debug('onSlotRequestedEvent', e)
     this.send('SLOT_REQUESTED', this.parseSlotAttributes(e.slot))
   }
 
@@ -178,7 +176,7 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
    * @param {Event} e
    */
   onSlotResponseReceived (e) {
-    //nrvideo.Log.debug('onSlotResponseReceived', e)
+    nrvideo.Log.debug('onSlotResponseReceived', e)
     this.send('SLOT_RECEIVED', this.parseSlotAttributes(e.slot))
   }
 }
