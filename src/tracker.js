@@ -18,7 +18,36 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
   constructor (options) {
     super(options)
 
+    this.reset()
+
     this.slots = {}
+  }
+
+  /** Resets all flags and chronos. */
+  reset () {
+    /**
+     * Time since last SLOT_RECEIVED event, in milliseconds.
+     * @private
+     */
+    this._timeSinceSlotReceived = new nrvideo.Chrono()
+
+    /**
+     * Time since last SLOT_RENDERED event, in milliseconds.
+     * @private
+     */
+    this._timeSinceSlotRendered = new nrvideo.Chrono()
+
+    /**
+     * Time since last SLOT_LOAD event, in milliseconds.
+     * @private
+     */
+    this._timeSinceSlotLoad = new nrvideo.Chrono()
+
+    /**
+     * Time since last SLOT_HIDDEN event, in milliseconds.
+     * @private
+     */
+    this._timeSinceLastSlotHidden = new nrvideo.Chrono()
   }
 
   /**
@@ -66,7 +95,10 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
       lineItemId: responseInfo.lineItemId,
       labelIds: responseInfo.labelIds,
       contentUrl: slot.getContentUrl(),
-      elementId: slot.getSlotElementId()
+      elementId: slot.getSlotElementId(),
+      timeSinceSlotLoad: this._timeSinceSlotLoad.getDeltaTime(),
+      timeSinceSlotReceived: this._timeSinceSlotReceived.getDeltaTime(),
+      timeSinceSlotRendered: this._timeSinceSlotRendered.getDeltaTime()
     }
   }
 
@@ -94,6 +126,7 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
   onSlotRenderEnded (e) {
     nrvideo.Log.debug('onSlotRenderEnded', e)
     this.send('SLOT_RENDERED', this.parseSlotAttributes(e.slot))
+    this._timeSinceSlotRendered.start()
   }
 
   /**
@@ -125,6 +158,7 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
   onSlotOnload (e) {
     nrvideo.Log.debug('onSlotOnload', e)
     this.send('SLOT_LOAD', this.parseSlotAttributes(e.slot))    
+    this._timeSinceSlotLoad.start()
   }
 
   /**
@@ -142,6 +176,7 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
         att.timeVisible = slotState.chrono.getDeltaTime()
 
         this.send('SLOT_HIDDEN', att)
+        this._timeSinceLastSlotHidden.start()
 
         slotState.visible = false
       } else if (!slotState.visible && e.inViewPercentage >= 50) {
@@ -172,5 +207,6 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
   onSlotResponseReceived (e) {
     nrvideo.Log.debug('onSlotResponseReceived', e)
     this.send('SLOT_RECEIVED', this.parseSlotAttributes(e.slot))
+    this._timeSinceSlotReceived.start()
   }
 }
