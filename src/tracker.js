@@ -182,7 +182,7 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
       } else if (!slotState.visible && e.inViewPercentage >= 50) {
         let att = this.parseSlotAttributes(e.slot)
         att.serviceName = e.serviceName
-
+        att.timeSinceLastSlotHidden = this._timeSinceLastSlotHidden.getDeltaTime()
         this.send('SLOT_VIEWABLE', att)
 
         slotState.chrono.start()
