@@ -7,10 +7,8 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
    * @static
    */
   static init () {
-    console.log("INIT FUNCTION");
     let trackers = nrvideo.Core.getTrackers()
     if (trackers.length == 0 || trackers == undefined) {
-      console.log("NOT CREATED YET, INIT TRACKER");
       let tracker = new GooglePublisherTagTracker()
       nrvideo.Core.addTracker(tracker)
       tracker.registerListeners()

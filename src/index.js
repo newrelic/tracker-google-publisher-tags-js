@@ -5,7 +5,6 @@ nrvideo.GooglePublisherTagTracker = Tracker
 
 document.addEventListener('readystatechange', (event) => {
     if (document.readyState === 'complete') {
-        console.log("On Ready State Change Complete");
         Tracker.init()
     }    
 })
