@@ -7,9 +7,12 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
    * @static
    */
   static init () {
-    let tracker = new GooglePublisherTagTracker()
-    nrvideo.Core.addTracker(tracker)
-    tracker.registerListeners()
+    let trackers = nrvideo.Core.getTrackers()
+    if (trackers.length == 0 || trackers == undefined) {
+      let tracker = new GooglePublisherTagTracker()
+      nrvideo.Core.addTracker(tracker)
+      tracker.registerListeners()
+    }
   }
 
   /**
