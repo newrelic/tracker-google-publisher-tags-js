@@ -90,12 +90,13 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
     let dict = {}
     let keys = googletag.pubads().getTargetingKeys()
     keys.forEach(key => {
+      let targKey = 'targ' + key.charAt(0).toUpperCase() + key.slice(1)
       let value = googletag.pubads().getTargeting(key)
       if (Array.isArray(value)) {
-        dict[key] = value.join(",")
+        dict[targKey] = value.join(",")
       }
       else {
-        dict[key] = value
+        dict[targKey] = value
       }
     })
     return dict
