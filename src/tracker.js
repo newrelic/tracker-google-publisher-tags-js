@@ -84,11 +84,29 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
   }
 
   /**
+   * Obtain targeting options.
+   */
+  parseTargetingKeys () {
+    let dict = {}
+    let keys = googletag.pubads().getTargetingKeys()
+    keys.forEach(key => {
+      let value = googletag.pubads().getTargeting(key)
+      if (Array.isArray(value)) {
+        dict[key] = value.join(",")
+      }
+      else {
+        dict[key] = value
+      }
+    })
+    return dict
+  }
+
+  /**
    * Parses slot object to create attributes to send to new relic.
    */
   parseSlotAttributes (slot) {
     let responseInfo = slot.getResponseInformation()
-    return {
+    let attr = {
       name: slot.getAdUnitPath(),
       slotId: slot.getSlotId().getId(),
       advertiserId: responseInfo.advertiserId,
@@ -103,6 +121,10 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
       timeSinceSlotReceived: this._timeSinceSlotReceived.getDeltaTime(),
       timeSinceSlotRendered: this._timeSinceSlotRendered.getDeltaTime()
     }
+
+    let dict = Object.assign(attr, this.parseTargetingKeys())
+    
+    return dict
   }
 
   /**
