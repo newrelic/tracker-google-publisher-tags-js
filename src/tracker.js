@@ -5,6 +5,7 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
   /**
    * This static methods initializes the GPT tracker. Will be automatically called.
    * @static
+   * @returns {object} Tracker reference.
    */
   static init () {
     let trackers = nrvideo.Core.getTrackers()
@@ -12,7 +13,9 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
       let tracker = new GooglePublisherTagTracker()
       nrvideo.Core.addTracker(tracker)
       tracker.registerListeners()
+      return tracker
     }
+    return null
   }
 
   /**
@@ -51,6 +54,12 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
      * @private
      */
     this._timeSinceLastSlotHidden = new nrvideo.Chrono()
+
+    /**
+     * List of Targeting keys to be included in the events.
+     * @private
+     */
+    this._targetingKeys = []
   }
 
   /**
@@ -84,16 +93,44 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
   }
 
   /**
+   * Returns list of Targeting keys
+   * @returns {Array} Targeting keys.
+   */
+  getTargetingKeys () {
+    return this._targetingKeys
+  }
+
+  /**
+   * Add a targeting key.
+   * @param {string} ley Targeting key.
+   */
+  setTargetingKey (key) {
+    this._targetingKeys.push(key)
+  }
+
+  /**
+   * Flush targeting keys.
+   */
+  flushTargetingKeys () {
+    this._targetingKeys = []
+  }
+
+  /**
    * Obtain targeting options.
    */
   parseTargetingKeys () {
     let dict = {}
-    let keys = googletag.pubads().getTargetingKeys()
+    let keys = this._targetingKeys
+    if (keys.length == 0) {
+      keys = googletag.pubads().getTargetingKeys()
+    }
     keys.forEach(key => {
       let targKey = 'targ' + key.charAt(0).toUpperCase() + key.slice(1)
       let value = googletag.pubads().getTargeting(key)
       if (Array.isArray(value)) {
-        dict[targKey] = value.join(",")
+        if (value.length > 0) {
+          dict[targKey] = value.join(",")
+        }
       }
       else {
         dict[targKey] = value
