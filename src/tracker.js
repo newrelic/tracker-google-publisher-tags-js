@@ -144,6 +144,18 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
    */
   parseSlotAttributes (slot) {
     let responseInfo = slot.getResponseInformation()
+
+    let contentUrl = new URL(slot.getContentUrl())
+    let searchParams = new URLSearchParams(contentUrl.search)
+    let truncState = false;
+
+    for (const [key, value] of searchParams.entries()) {
+      if (key == "trunc" && value == "1") {
+        truncState = true
+        break
+      }
+    }
+
     let attr = {
       name: slot.getAdUnitPath(),
       slotId: slot.getSlotId().getId(),
@@ -157,11 +169,12 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
       elementId: slot.getSlotElementId(),
       timeSinceSlotLoad: this._timeSinceSlotLoad.getDeltaTime(),
       timeSinceSlotReceived: this._timeSinceSlotReceived.getDeltaTime(),
-      timeSinceSlotRendered: this._timeSinceSlotRendered.getDeltaTime()
+      timeSinceSlotRendered: this._timeSinceSlotRendered.getDeltaTime(),
+      trunc: truncState
     }
 
     let dict = Object.assign(attr, this.parseTargetingKeys())
-    
+
     return dict
   }
 
