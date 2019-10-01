@@ -9,13 +9,16 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
    */
   static init () {
     let trackers = nrvideo.Core.getTrackers()
-    if (trackers.length == 0 || trackers == undefined) {
-      let tracker = new GooglePublisherTagTracker()
-      nrvideo.Core.addTracker(tracker)
-      tracker.registerListeners()
-      return tracker
+    for (let i = 0 ; i < trackers.length ; i++) {
+      if (trackers[i] instanceof GooglePublisherTagTracker) {
+        return null
+      }
     }
-    return null
+
+    let tracker = new GooglePublisherTagTracker()
+    nrvideo.Core.addTracker(tracker)
+    tracker.registerListeners()
+    return tracker
   }
 
   /**
