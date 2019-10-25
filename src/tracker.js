@@ -162,18 +162,23 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
     let attr = {
       name: slot.getAdUnitPath(),
       slotId: slot.getSlotId().getId(),
-      advertiserId: responseInfo.advertiserId,
-      campaignId: responseInfo.campaignId,
-      creativeId: responseInfo.creativeId,
-      creativeTemplateId: responseInfo.creativeTemplateId,
-      lineItemId: responseInfo.lineItemId,
-      labelIds: responseInfo.labelIds,
       contentUrl: slot.getContentUrl(),
       elementId: slot.getSlotElementId(),
       timeSinceSlotLoad: this._timeSinceSlotLoad.getDeltaTime(),
       timeSinceSlotReceived: this._timeSinceSlotReceived.getDeltaTime(),
       timeSinceSlotRendered: this._timeSinceSlotRendered.getDeltaTime(),
       trunc: truncState
+    }
+
+    if (responseInfo != null) {
+      attr = Object.assign(attr, {
+        advertiserId: responseInfo.advertiserId,
+        campaignId: responseInfo.campaignId,
+        creativeId: responseInfo.creativeId,
+        creativeTemplateId: responseInfo.creativeTemplateId,
+        lineItemId: responseInfo.lineItemId,
+        labelIds: responseInfo.labelIds
+      })
     }
 
     let dict = Object.assign(attr, this.parseTargetingKeys())
