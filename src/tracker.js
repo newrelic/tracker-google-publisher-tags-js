@@ -192,7 +192,7 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
         pubads.addEventListener('impressionViewable', this.onImpressionViewable.bind(this))
         pubads.addEventListener('slotOnload', this.onSlotOnload.bind(this))
         pubads.addEventListener('slotVisibilityChanged', this.onSlotVisibilityChanged.bind(this))
-        pubads.addEventListener('slotRequestedEvent', this.onSlotRequestedEvent.bind(this))
+        pubads.addEventListener('slotRequested', this.onSlotRequested.bind(this))
         pubads.addEventListener('slotResponseReceived', this.onSlotResponseReceived.bind(this))
       })
     }
@@ -271,11 +271,11 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
   }
 
   /**
-   * Called once GPT fires 'onSlotRequestedEvent' event.
+   * Called once GPT fires 'onSlotRequested' event.
    * @param {Event} e
    */
-  onSlotRequestedEvent (e) {
-    nrvideo.Log.debug('onSlotRequestedEvent', e)
+  onSlotRequested (e) {
+    nrvideo.Log.debug('onSlotRequested', e)
     this.send('SLOT_REQUESTED', this.parseSlotAttributes(e.slot))
   }
 
