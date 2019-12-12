@@ -2,7 +2,7 @@
 #### [New Relic](http://newrelic.com) video tracking for google Publisher Tag
 
 ## Requirements
-This video monitor solutions works on top of New Relic's **Browser PRO + SPA Agent**.
+This video monitor solutions works on top of New Relic's **Browser Pro + SPA Agent**.
 
 ## Usage
 Just include the scripts inside `dist` folder to your page. See `sample` folder for example.
