@@ -2,7 +2,7 @@
 #### [New Relic](http://newrelic.com) monitoring for Google Publishers Tag
 
 ## Requirements
-This olution works on top of New Relic's **Browser Pro + SPA Agent**.
+This solution works on top of New Relic's **Browser Pro + SPA Agent**.
 
 ## Usage
 Include the scripts inside `dist` folder to your page. See `sample` folder for example.
