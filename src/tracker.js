@@ -145,7 +145,8 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
   /**
    * Parses slot object to create attributes to send to new relic.
    */
-  parseSlotAttributes (slot) {
+  parseSlotAttributes (event) {
+    let slot = event.slot
     let responseInfo = slot.getResponseInformation()
 
     let contentUrl = new URL(slot.getContentUrl())
@@ -177,7 +178,9 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
         creativeId: responseInfo.creativeId,
         creativeTemplateId: responseInfo.creativeTemplateId,
         lineItemId: responseInfo.lineItemId,
-        labelIds: responseInfo.labelIds
+        labelIds: responseInfo.labelIds,
+        isEmpty: event.isEmpty,
+        size: event.size
       })
     }
 
@@ -209,7 +212,7 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
    */
   onSlotRenderEnded (e) {
     nrvideo.Log.debug('onSlotRenderEnded', e)
-    this.send('SLOT_RENDERED', this.parseSlotAttributes(e.slot))
+    this.send('SLOT_RENDERED', this.parseSlotAttributes(e))
     this._timeSinceSlotRendered.start()
   }
 
@@ -224,7 +227,7 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
       let slotState = this.getSlotState(id)
 
       if (!slotState.visible) {
-        let att = this.parseSlotAttributes(e.slot)
+        let att = this.parseSlotAttributes(e)
         att.serviceName = e.serviceName
 
         this.send('SLOT_VIEWABLE', att)
@@ -241,7 +244,7 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
    */
   onSlotOnload (e) {
     nrvideo.Log.debug('onSlotOnload', e)
-    this.send('SLOT_LOAD', this.parseSlotAttributes(e.slot))    
+    this.send('SLOT_LOAD', this.parseSlotAttributes(e))    
     this._timeSinceSlotLoad.start()
   }
 
@@ -255,7 +258,7 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
       let id = e.slot.getSlotId().getId()
       let slotState = this.getSlotState(id)
       if (slotState.visible && e.inViewPercentage < 50) {
-        let att = this.parseSlotAttributes(e.slot)
+        let att = this.parseSlotAttributes(e)
         att.serviceName = e.serviceName
         att.timeVisible = slotState.chrono.getDeltaTime()
 
@@ -264,7 +267,7 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
 
         slotState.visible = false
       } else if (!slotState.visible && e.inViewPercentage >= 50) {
-        let att = this.parseSlotAttributes(e.slot)
+        let att = this.parseSlotAttributes(e)
         att.serviceName = e.serviceName
         att.timeSinceLastSlotHidden = this._timeSinceLastSlotHidden.getDeltaTime()
         this.send('SLOT_VIEWABLE', att)
@@ -281,7 +284,7 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
    */
   onSlotRequested (e) {
     nrvideo.Log.debug('onSlotRequested', e)
-    this.send('SLOT_REQUESTED', this.parseSlotAttributes(e.slot))
+    this.send('SLOT_REQUESTED', this.parseSlotAttributes(e))
   }
 
   /**
@@ -290,7 +293,7 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
    */
   onSlotResponseReceived (e) {
     nrvideo.Log.debug('onSlotResponseReceived', e)
-    this.send('SLOT_RECEIVED', this.parseSlotAttributes(e.slot))
+    this.send('SLOT_RECEIVED', this.parseSlotAttributes(e))
     this._timeSinceSlotReceived.start()
   }
 }
