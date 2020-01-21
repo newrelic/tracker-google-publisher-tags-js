@@ -59,6 +59,12 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
     this._timeSinceLastSlotHidden = new nrvideo.Chrono()
 
     /**
+     * Time since last SLOT_REQUESTED event, in milliseconds.
+     * @private
+     */
+    this._timeSinceSlotRequested = new nrvideo.Chrono()
+
+    /**
      * List of Targeting keys to be included in the events.
      * @private
      */
@@ -168,6 +174,7 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
       timeSinceSlotLoad: this._timeSinceSlotLoad.getDeltaTime(),
       timeSinceSlotReceived: this._timeSinceSlotReceived.getDeltaTime(),
       timeSinceSlotRendered: this._timeSinceSlotRendered.getDeltaTime(),
+      timeSinceSlotRequested: this._timeSinceSlotRequested.getDeltaTime(),
       trunc: truncState
     }
 
@@ -285,6 +292,7 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
   onSlotRequested (e) {
     nrvideo.Log.debug('onSlotRequested', e)
     this.send('SLOT_REQUESTED', this.parseSlotAttributes(e))
+    this._timeSinceSlotRequested.start()
   }
 
   /**
