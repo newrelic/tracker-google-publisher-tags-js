@@ -17,6 +17,9 @@
     "url": "git@source.datanerd.us:video/google-publisher-tag-js.git"
   },
   "author": "Jordi Aguilar",
+  "contributors": [
+      "Andreu Santarén Llop"
+  ],
   "license": "MIT",
   "dependencies": {
     "newrelic-video-core": "github:newrelic/video-core-js#v0.10.0"
