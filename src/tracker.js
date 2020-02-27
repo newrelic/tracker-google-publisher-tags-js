@@ -11,7 +11,7 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
     let trackers = nrvideo.Core.getTrackers()
     for (let i = 0 ; i < trackers.length ; i++) {
       if (trackers[i] instanceof GooglePublisherTagTracker) {
-        return null
+        return trackers[i]
       }
     }
 
@@ -69,6 +69,12 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
      * @private
      */
     this._targetingKeys = []
+
+    /**
+     * Visibility trigger level.
+     * @private
+     */
+    this._visibilityTriggerLevel = 50
   }
 
   /**
@@ -122,6 +128,16 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
    */
   flushTargetingKeys () {
     this._targetingKeys = []
+  }
+
+  /**
+   * Change visibility trigger level.
+   * @param {integer} level Trigger level, percentage.
+   */
+  setVisibilityTriggerLevel (level) {
+    if (level >= 0 && level <= 100) {
+      this._visibilityTriggerLevel = level
+    }
   }
 
   /**
@@ -198,6 +214,15 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
   }
 
   /**
+   * Append visibility related attributes
+   */
+  appendVisibilityAttributes (e, att) {
+    att["visibilityTriggerLevel"] = this._visibilityTriggerLevel
+    att["visibilityLevel"] = e.inViewPercentage
+    return att
+  }
+
+  /**
    * Register listeners.
    */
   registerListeners () {
@@ -237,7 +262,7 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
       if (!slotState.visible) {
         let att = this.parseSlotAttributes(e)
         att.serviceName = e.serviceName
-
+        att = this.appendVisibilityAttributes(e, att)
         this.send('SLOT_VIEWABLE', att)
 
         slotState.chrono.start()
@@ -265,19 +290,20 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
     if (e && e.slot) {
       let id = e.slot.getSlotId().getId()
       let slotState = this.getSlotState(id)
-      if (slotState.visible && e.inViewPercentage < 50) {
+      if (slotState.visible && e.inViewPercentage < this._visibilityTriggerLevel) {
         let att = this.parseSlotAttributes(e)
         att.serviceName = e.serviceName
         att.timeVisible = slotState.chrono.getDeltaTime()
-
+        att = this.appendVisibilityAttributes(e, att)
         this.send('SLOT_HIDDEN', att)
         this._timeSinceLastSlotHidden.start()
 
         slotState.visible = false
-      } else if (!slotState.visible && e.inViewPercentage >= 50) {
+      } else if (!slotState.visible && e.inViewPercentage >= this._visibilityTriggerLevel) {
         let att = this.parseSlotAttributes(e)
         att.serviceName = e.serviceName
         att.timeSinceLastSlotHidden = this._timeSinceLastSlotHidden.getDeltaTime()
+        att = this.appendVisibilityAttributes(e, att)
         this.send('SLOT_VIEWABLE', att)
 
         slotState.chrono.start()
