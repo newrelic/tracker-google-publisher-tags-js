@@ -167,6 +167,7 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
     }
 
     let attr = {
+      libVersion: googletag.getVersion(),
       slotName: slot.getAdUnitPath(),
       slotId: slot.getSlotId().getId(),
       contentUrl: slot.getContentUrl(),
