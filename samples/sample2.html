@@ -1,0 +1,57 @@
+<html>
+  <head>
+    <!-- newrelic browser agent. REMEMBER TO REPLACE THIS SCRIPT WITH YOUR OWN BROWSER AGENT -->
+    <script type="text/javascript" src="agent.js"></script>
+
+    <!-- newrelic GPT Tracker -->
+    <script type="text/javascript" src="../dist/newrelic-google-publisher-tag.min.js"></script>
+
+    <!-- google tags -->
+    <script type="text/javascript">
+      var googletag = googletag || {};
+      googletag.cmd = googletag.cmd || [];
+      (function() {
+        var gads = document.createElement("script");
+        gads.async = true;
+        gads.type = "text/javascript";
+        var useSSL = "https:" == document.location.protocol;
+        gads.src = (useSSL ? "https:" : "http:") + "//www.googletagservices.com/tag/js/gpt.js";
+        var node =document.getElementsByTagName("script")[0];
+        node.parentNode.insertBefore(gads, node);
+       })();
+    </script>
+
+    <script type="text/javascript">
+      googletag.cmd.push(function() {
+        var adSlot1 = googletag.defineSlot('/6355419/Travel/Europe/France/Paris',[300, 250], "banner1")
+        adSlot1.addService(googletag.pubads())
+        var adSlot2 = googletag.defineSlot('/6355419/Travel/Europe/France/Paris',[300, 250], "banner2")
+        adSlot2.addService(googletag.pubads())
+        googletag.pubads().setTargeting('interests', ['music', 'sports']);
+        googletag.pubads().setTargeting('age', '18-55');
+        googletag.enableServices()
+
+        // Init New Relic GPT Tracker
+        let tracker = nrvideo.GooglePublisherTagTracker.init()
+        // Optional: only include the selected targeting keys. By default all keys will be included.
+        if (tracker != null) {
+          tracker.setTargetingKey("age")
+          tracker.setVisibilityTriggerLevel(10)
+        }
+      })
+    </script>
+  </head>
+  <body>
+      <p>Hello world GPT Ad!</p>
+      <div style="height: 1500px;">---Spacer---</div>      
+      <div id="banner1" style="width:300px; height:250px;"></div>
+      <div style="height: 100px;">---Spacer---</div>
+      <div id="banner2" style="width:300px; height:250px;"></div>
+      <script type="text/javascript">
+        googletag.cmd.push(function() {
+          googletag.display('banner1');
+          googletag.display('banner2');
+        });
+      </script>
+  </body>
+</html>
