@@ -35,34 +35,10 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
   /** Resets all flags and chronos. */
   reset () {
     /**
-     * Time since last SLOT_RECEIVED event, in milliseconds.
-     * @private
-     */
-    this._timeSinceSlotReceived = new nrvideo.Chrono()
-
-    /**
-     * Time since last SLOT_RENDERED event, in milliseconds.
-     * @private
-     */
-    this._timeSinceSlotRendered = new nrvideo.Chrono()
-
-    /**
-     * Time since last SLOT_LOAD event, in milliseconds.
-     * @private
-     */
-    this._timeSinceSlotLoad = new nrvideo.Chrono()
-
-    /**
      * Time since last SLOT_HIDDEN event, in milliseconds.
      * @private
      */
     this._timeSinceLastSlotHidden = new nrvideo.Chrono()
-
-    /**
-     * Time since last SLOT_REQUESTED event, in milliseconds.
-     * @private
-     */
-    this._timeSinceSlotRequested = new nrvideo.Chrono()
 
     /**
      * List of Targeting keys to be included in the events.
@@ -75,6 +51,12 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
      * @private
      */
     this._visibilityTriggerLevel = 50
+
+    /**
+     * Slot specific attributes.
+     * @private
+     */
+    this._slotAttributes = {}
   }
 
   /**
@@ -188,12 +170,11 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
       slotId: slot.getSlotId().getId(),
       contentUrl: slot.getContentUrl(),
       elementId: slot.getSlotElementId(),
-      timeSinceSlotLoad: this._timeSinceSlotLoad.getDeltaTime(),
-      timeSinceSlotReceived: this._timeSinceSlotReceived.getDeltaTime(),
-      timeSinceSlotRendered: this._timeSinceSlotRendered.getDeltaTime(),
-      timeSinceSlotRequested: this._timeSinceSlotRequested.getDeltaTime(),
       trunc: truncState
     }
+
+    // Get timers for current slot
+    attr = this.generateTimerAttributesForSlot(slot.getSlotId().getId(), attr)
 
     if (responseInfo != null) {
       attr = Object.assign(attr, {
@@ -211,6 +192,30 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
     let dict = Object.assign(attr, this.parseTargetingKeys())
 
     return dict
+  }
+
+  /**
+   * Generate timer attributes for a certain slot ID
+   */
+  generateTimerAttributesForSlot (slotId, attr) {
+    if (this._slotAttributes[slotId] != undefined) {
+      for (const [key, value] of Object.entries(this._slotAttributes[slotId])) {
+        attr[key] = value.getDeltaTime()
+      }
+    }
+    return attr
+  }
+
+  /**
+   * Add timer to slot
+   */
+  addTimerToSlot (slotId, timerName) {
+    let crono = new nrvideo.Chrono()
+    crono.start()
+    if (this._slotAttributes[slotId] == undefined) {
+      this._slotAttributes[slotId] = {}
+    }
+    this._slotAttributes[slotId][timerName] = crono
   }
 
   /**
@@ -246,7 +251,8 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
   onSlotRenderEnded (e) {
     nrvideo.Log.debug('onSlotRenderEnded', e)
     this.send('SLOT_RENDERED', this.parseSlotAttributes(e))
-    this._timeSinceSlotRendered.start()
+    let id = e.slot.getSlotId().getId()
+    this.addTimerToSlot(id, "timeSinceSlotRendered")
   }
 
   /**
@@ -278,7 +284,8 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
   onSlotOnload (e) {
     nrvideo.Log.debug('onSlotOnload', e)
     this.send('SLOT_LOAD', this.parseSlotAttributes(e))    
-    this._timeSinceSlotLoad.start()
+    let id = e.slot.getSlotId().getId()
+    this.addTimerToSlot(id, "timeSinceSlotLoad")
   }
 
   /**
@@ -319,7 +326,8 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
   onSlotRequested (e) {
     nrvideo.Log.debug('onSlotRequested', e)
     this.send('SLOT_REQUESTED', this.parseSlotAttributes(e))
-    this._timeSinceSlotRequested.start()
+    let id = e.slot.getSlotId().getId()
+    this.addTimerToSlot(id, "timeSinceSlotRequested")
   }
 
   /**
@@ -329,6 +337,7 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
   onSlotResponseReceived (e) {
     nrvideo.Log.debug('onSlotResponseReceived', e)
     this.send('SLOT_RECEIVED', this.parseSlotAttributes(e))
-    this._timeSinceSlotReceived.start()
+    let id = e.slot.getSlotId().getId()
+    this.addTimerToSlot(id, "timeSinceSlotReceived")
   }
 }
