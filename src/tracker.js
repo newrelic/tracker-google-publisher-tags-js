@@ -184,7 +184,6 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
         creativeId: responseInfo.creativeId,
         creativeTemplateId: responseInfo.creativeTemplateId,
         lineItemId: responseInfo.lineItemId,
-        labelIds: responseInfo.labelIds,
         isEmpty: event.isEmpty,
         size: event.size
       })
