@@ -289,7 +289,6 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
 
       if (!slotState.visible) {
         let att = this.parseSlotAttributes(e)
-        att.serviceName = e.serviceName
         att = this.appendVisibilityAttributes(e, att)
         this.send('SLOT_VIEWABLE', att)
 
