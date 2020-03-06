@@ -33,11 +33,12 @@
 
         // Init New Relic GPT Tracker
         let tracker = nrvideo.GooglePublisherTagTracker.init()
+
         // Optional: only include the selected targeting keys. By default all keys will be included.
-        if (tracker != null) {
-          tracker.setTargetingKey("age")
-          tracker.setVisibilityTriggerLevel(10)
-        }
+        tracker.setTargetingKey("age")
+
+        // Set visibility level to 10%
+        tracker.setVisibilityTriggerLevel(10)
       })
     </script>
   </head>
