@@ -171,7 +171,8 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
       slotId: slot.getSlotId().getId(),
       contentUrl: slot.getContentUrl(),
       elementId: slot.getSlotElementId(),
-      trunc: truncState
+      trunc: truncState,
+      serviceName: event.serviceName
     }
 
     // Get timers for current slot
@@ -320,7 +321,6 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
       let slotState = this.getSlotState(id)
       if (slotState.visible && e.inViewPercentage < this._visibilityTriggerLevel) {
         let att = this.parseSlotAttributes(e)
-        att.serviceName = e.serviceName
         att.timeVisible = slotState.chrono.getDeltaTime()
         att = this.appendVisibilityAttributes(e, att)
         this.send('SLOT_HIDDEN', att)
@@ -329,7 +329,6 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
         slotState.visible = false
       } else if (!slotState.visible && e.inViewPercentage >= this._visibilityTriggerLevel) {
         let att = this.parseSlotAttributes(e)
-        att.serviceName = e.serviceName
         att.timeSinceLastSlotHidden = this.getLastHiddenTimerFromSlot(id)
         att = this.appendVisibilityAttributes(e, att)
         this.send('SLOT_VIEWABLE', att)
