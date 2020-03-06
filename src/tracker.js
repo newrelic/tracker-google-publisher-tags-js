@@ -29,17 +29,12 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
 
     this.reset()
 
+    //TODO: move this functionality to _slotAttributes
     this.slots = {}
   }
 
   /** Resets all flags and chronos. */
   reset () {
-    /**
-     * Time since last SLOT_HIDDEN event, in milliseconds.
-     * @private
-     */
-    this._timeSinceLastSlotHidden = new nrvideo.Chrono()
-
     /**
      * List of Targeting keys to be included in the events.
      * @private
@@ -57,6 +52,12 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
      * @private
      */
     this._slotAttributes = {}
+
+    /**
+     * Time since last SLOT_HIDDEN event in milliseconds, by slot.
+     * @private
+     */
+    this._timeSinceLastSlotHiddenBySlot = {}
   }
 
   /**
@@ -207,6 +208,27 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
   }
 
   /**
+   * Add last hidden timer to slot
+   */
+  addLastHiddenTimerToSlot (slotId) {
+    let crono = new nrvideo.Chrono()
+    crono.start()
+    this._timeSinceLastSlotHiddenBySlot[slotId] = crono
+  }
+
+  /**
+   * Get last hidden timer of a slot
+   */
+  getLastHiddenTimerFromSlot (slotId) {
+    if (this._timeSinceLastSlotHiddenBySlot[slotId] instanceof nrvideo.Chrono) {
+      return this._timeSinceLastSlotHiddenBySlot[slotId].getDeltaTime()
+    }
+    else {
+      return null
+    }
+  }
+
+  /**
    * Add timer to slot
    */
   addTimerToSlot (slotId, timerName) {
@@ -303,13 +325,13 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
         att.timeVisible = slotState.chrono.getDeltaTime()
         att = this.appendVisibilityAttributes(e, att)
         this.send('SLOT_HIDDEN', att)
-        this._timeSinceLastSlotHidden.start()
+        this.addLastHiddenTimerToSlot(id)
 
         slotState.visible = false
       } else if (!slotState.visible && e.inViewPercentage >= this._visibilityTriggerLevel) {
         let att = this.parseSlotAttributes(e)
         att.serviceName = e.serviceName
-        att.timeSinceLastSlotHidden = this._timeSinceLastSlotHidden.getDeltaTime()
+        att.timeSinceLastSlotHidden = this.getLastHiddenTimerFromSlot(id)
         att = this.appendVisibilityAttributes(e, att)
         this.send('SLOT_VIEWABLE', att)
 
