@@ -11,7 +11,7 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
     let trackers = nrvideo.Core.getTrackers()
     for (let i = 0 ; i < trackers.length ; i++) {
       if (trackers[i] instanceof GooglePublisherTagTracker) {
-        return null
+        return trackers[i]
       }
     }
 
@@ -29,46 +29,35 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
 
     this.reset()
 
+    //TODO: move this functionality to _slotAttributes
     this.slots = {}
   }
 
   /** Resets all flags and chronos. */
   reset () {
     /**
-     * Time since last SLOT_RECEIVED event, in milliseconds.
-     * @private
-     */
-    this._timeSinceSlotReceived = new nrvideo.Chrono()
-
-    /**
-     * Time since last SLOT_RENDERED event, in milliseconds.
-     * @private
-     */
-    this._timeSinceSlotRendered = new nrvideo.Chrono()
-
-    /**
-     * Time since last SLOT_LOAD event, in milliseconds.
-     * @private
-     */
-    this._timeSinceSlotLoad = new nrvideo.Chrono()
-
-    /**
-     * Time since last SLOT_HIDDEN event, in milliseconds.
-     * @private
-     */
-    this._timeSinceLastSlotHidden = new nrvideo.Chrono()
-
-    /**
-     * Time since last SLOT_REQUESTED event, in milliseconds.
-     * @private
-     */
-    this._timeSinceSlotRequested = new nrvideo.Chrono()
-
-    /**
      * List of Targeting keys to be included in the events.
      * @private
      */
     this._targetingKeys = []
+
+    /**
+     * Visibility trigger level.
+     * @private
+     */
+    this._visibilityTriggerLevel = 50
+
+    /**
+     * Slot specific attributes.
+     * @private
+     */
+    this._slotAttributes = {}
+
+    /**
+     * Time since last SLOT_HIDDEN event in milliseconds, by slot.
+     * @private
+     */
+    this._timeSinceLastSlotHiddenBySlot = {}
   }
 
   /**
@@ -125,6 +114,16 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
   }
 
   /**
+   * Change visibility trigger level.
+   * @param {integer} level Trigger level, percentage.
+   */
+  setVisibilityTriggerLevel (level) {
+    if (level >= 0 && level <= 100) {
+      this._visibilityTriggerLevel = level
+    }
+  }
+
+  /**
    * Obtain targeting options.
    */
   parseTargetingKeys () {
@@ -167,16 +166,17 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
     }
 
     let attr = {
+      libVersion: googletag.getVersion(),
       slotName: slot.getAdUnitPath(),
       slotId: slot.getSlotId().getId(),
       contentUrl: slot.getContentUrl(),
       elementId: slot.getSlotElementId(),
-      timeSinceSlotLoad: this._timeSinceSlotLoad.getDeltaTime(),
-      timeSinceSlotReceived: this._timeSinceSlotReceived.getDeltaTime(),
-      timeSinceSlotRendered: this._timeSinceSlotRendered.getDeltaTime(),
-      timeSinceSlotRequested: this._timeSinceSlotRequested.getDeltaTime(),
-      trunc: truncState
+      trunc: truncState,
+      serviceName: event.serviceName
     }
+
+    // Get timers for current slot
+    attr = this.generateTimerAttributesForSlot(slot.getSlotId().getId(), attr)
 
     if (responseInfo != null) {
       attr = Object.assign(attr, {
@@ -185,7 +185,6 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
         creativeId: responseInfo.creativeId,
         creativeTemplateId: responseInfo.creativeTemplateId,
         lineItemId: responseInfo.lineItemId,
-        labelIds: responseInfo.labelIds,
         isEmpty: event.isEmpty,
         size: event.size
       })
@@ -194,6 +193,60 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
     let dict = Object.assign(attr, this.parseTargetingKeys())
 
     return dict
+  }
+
+  /**
+   * Generate timer attributes for a certain slot ID
+   */
+  generateTimerAttributesForSlot (slotId, attr) {
+    if (this._slotAttributes[slotId] != undefined) {
+      for (const [key, value] of Object.entries(this._slotAttributes[slotId])) {
+        attr[key] = value.getDeltaTime()
+      }
+    }
+    return attr
+  }
+
+  /**
+   * Add last hidden timer to slot
+   */
+  addLastHiddenTimerToSlot (slotId) {
+    let crono = new nrvideo.Chrono()
+    crono.start()
+    this._timeSinceLastSlotHiddenBySlot[slotId] = crono
+  }
+
+  /**
+   * Get last hidden timer of a slot
+   */
+  getLastHiddenTimerFromSlot (slotId) {
+    if (this._timeSinceLastSlotHiddenBySlot[slotId] instanceof nrvideo.Chrono) {
+      return this._timeSinceLastSlotHiddenBySlot[slotId].getDeltaTime()
+    }
+    else {
+      return null
+    }
+  }
+
+  /**
+   * Add timer to slot
+   */
+  addTimerToSlot (slotId, timerName) {
+    let crono = new nrvideo.Chrono()
+    crono.start()
+    if (this._slotAttributes[slotId] == undefined) {
+      this._slotAttributes[slotId] = {}
+    }
+    this._slotAttributes[slotId][timerName] = crono
+  }
+
+  /**
+   * Append visibility related attributes
+   */
+  appendVisibilityAttributes (e, att) {
+    att["visibilityTriggerLevel"] = this._visibilityTriggerLevel
+    att["visibilityLevel"] = e.inViewPercentage
+    return att
   }
 
   /**
@@ -220,7 +273,8 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
   onSlotRenderEnded (e) {
     nrvideo.Log.debug('onSlotRenderEnded', e)
     this.send('SLOT_RENDERED', this.parseSlotAttributes(e))
-    this._timeSinceSlotRendered.start()
+    let id = e.slot.getSlotId().getId()
+    this.addTimerToSlot(id, "timeSinceSlotRendered")
   }
 
   /**
@@ -235,8 +289,7 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
 
       if (!slotState.visible) {
         let att = this.parseSlotAttributes(e)
-        att.serviceName = e.serviceName
-
+        att = this.appendVisibilityAttributes(e, att)
         this.send('SLOT_VIEWABLE', att)
 
         slotState.chrono.start()
@@ -252,7 +305,8 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
   onSlotOnload (e) {
     nrvideo.Log.debug('onSlotOnload', e)
     this.send('SLOT_LOAD', this.parseSlotAttributes(e))    
-    this._timeSinceSlotLoad.start()
+    let id = e.slot.getSlotId().getId()
+    this.addTimerToSlot(id, "timeSinceSlotLoad")
   }
 
   /**
@@ -264,19 +318,18 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
     if (e && e.slot) {
       let id = e.slot.getSlotId().getId()
       let slotState = this.getSlotState(id)
-      if (slotState.visible && e.inViewPercentage < 50) {
+      if (slotState.visible && e.inViewPercentage < this._visibilityTriggerLevel) {
         let att = this.parseSlotAttributes(e)
-        att.serviceName = e.serviceName
         att.timeVisible = slotState.chrono.getDeltaTime()
-
+        att = this.appendVisibilityAttributes(e, att)
         this.send('SLOT_HIDDEN', att)
-        this._timeSinceLastSlotHidden.start()
+        this.addLastHiddenTimerToSlot(id)
 
         slotState.visible = false
-      } else if (!slotState.visible && e.inViewPercentage >= 50) {
+      } else if (!slotState.visible && e.inViewPercentage >= this._visibilityTriggerLevel) {
         let att = this.parseSlotAttributes(e)
-        att.serviceName = e.serviceName
-        att.timeSinceLastSlotHidden = this._timeSinceLastSlotHidden.getDeltaTime()
+        att.timeSinceLastSlotHidden = this.getLastHiddenTimerFromSlot(id)
+        att = this.appendVisibilityAttributes(e, att)
         this.send('SLOT_VIEWABLE', att)
 
         slotState.chrono.start()
@@ -292,7 +345,8 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
   onSlotRequested (e) {
     nrvideo.Log.debug('onSlotRequested', e)
     this.send('SLOT_REQUESTED', this.parseSlotAttributes(e))
-    this._timeSinceSlotRequested.start()
+    let id = e.slot.getSlotId().getId()
+    this.addTimerToSlot(id, "timeSinceSlotRequested")
   }
 
   /**
@@ -302,6 +356,7 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
   onSlotResponseReceived (e) {
     nrvideo.Log.debug('onSlotResponseReceived', e)
     this.send('SLOT_RECEIVED', this.parseSlotAttributes(e))
-    this._timeSinceSlotReceived.start()
+    let id = e.slot.getSlotId().getId()
+    this.addTimerToSlot(id, "timeSinceSlotReceived")
   }
 }
