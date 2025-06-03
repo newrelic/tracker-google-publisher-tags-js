@@ -1,18 +1,16 @@
-import * as nrvideo from 'newrelic-video-core'
-import Tracker from './tracker'
-
-nrvideo.GooglePublisherTagTracker = Tracker
+import { GooglePublisherTagTracker } from './tracker'
 
 document.addEventListener('readystatechange', (event) => {
     if (document.readyState === 'complete') {
-        Tracker.init()
-    }    
+        GooglePublisherTagTracker.init()
+    }
 })
 
 if (window.addEventListener) {
-    window.addEventListener('load', Tracker.init, false)
+    window.addEventListener('load', GooglePublisherTagTracker.init, false)
 } else if (window.attachEvent) {
-    window.attachEvent('onload', Tracker.init)
+    window.attachEvent('onload', GooglePublisherTagTracker.init)
 }
 
-module.exports = nrvideo
+export * from 'newrelic-video-core'
+export { GooglePublisherTagTracker }
