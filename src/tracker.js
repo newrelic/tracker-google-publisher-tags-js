@@ -1,14 +1,14 @@
-import * as nrvideo from 'newrelic-video-core'
-import { version } from '../package.json'
+import { Core, Tracker, Chrono, Log } from 'newrelic-video-core'
+import pkg from '../package.json'
 
-export default class GooglePublisherTagTracker extends nrvideo.Tracker {
+export class GooglePublisherTagTracker extends Tracker {
   /**
    * This static methods initializes the GPT tracker. Will be automatically called.
    * @static
    * @returns {object} Tracker reference.
    */
   static init () {
-    let trackers = nrvideo.Core.getTrackers()
+    let trackers = Core.getTrackers()
     for (let i = 0 ; i < trackers.length ; i++) {
       if (trackers[i] instanceof GooglePublisherTagTracker) {
         return trackers[i]
@@ -16,7 +16,7 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
     }
 
     let tracker = new GooglePublisherTagTracker()
-    nrvideo.Core.addTracker(tracker)
+    Core.addTracker(tracker)
     tracker.registerListeners()
     return tracker
   }
@@ -73,7 +73,7 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
    * @returns {String} Tracker version.
    */
   getTrackerVersion () {
-    return version
+    return pkg.version
   }
 
   /**
@@ -83,7 +83,7 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
   getSlotState (slotId) {
     if (!this.slots[slotId]) { // first time
       this.slots[slotId] = {
-        chrono: new nrvideo.Chrono(),
+        chrono: new Chrono(),
         visible: false
       }
     }
@@ -211,7 +211,7 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
    * Add last hidden timer to slot
    */
   addLastHiddenTimerToSlot (slotId) {
-    let crono = new nrvideo.Chrono()
+    let crono = new Chrono()
     crono.start()
     this._timeSinceLastSlotHiddenBySlot[slotId] = crono
   }
@@ -220,7 +220,7 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
    * Get last hidden timer of a slot
    */
   getLastHiddenTimerFromSlot (slotId) {
-    if (this._timeSinceLastSlotHiddenBySlot[slotId] instanceof nrvideo.Chrono) {
+    if (this._timeSinceLastSlotHiddenBySlot[slotId] instanceof Chrono) {
       return this._timeSinceLastSlotHiddenBySlot[slotId].getDeltaTime()
     }
     else {
@@ -232,7 +232,7 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
    * Add timer to slot
    */
   addTimerToSlot (slotId, timerName) {
-    let crono = new nrvideo.Chrono()
+    let crono = new Chrono()
     crono.start()
     if (this._slotAttributes[slotId] == undefined) {
       this._slotAttributes[slotId] = {}
@@ -271,7 +271,7 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
    * @param {Event} e
    */
   onSlotRenderEnded (e) {
-    nrvideo.Log.debug('onSlotRenderEnded', e)
+    Log.debug('onSlotRenderEnded', e)
     this.send('SLOT_RENDERED', this.parseSlotAttributes(e))
     let id = e.slot.getSlotId().getId()
     this.addTimerToSlot(id, "timeSinceSlotRendered")
@@ -282,7 +282,7 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
    * @param {Event} e
    */
   onImpressionViewable (e) {
-    nrvideo.Log.debug('onImpressionViewable', e)
+    Log.debug('onImpressionViewable', e)
     if (e && e.slot) {
       let id = e.slot.getSlotId().getId()
       let slotState = this.getSlotState(id)
@@ -303,7 +303,7 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
    * @param {Event} e
    */
   onSlotOnload (e) {
-    nrvideo.Log.debug('onSlotOnload', e)
+    Log.debug('onSlotOnload', e)
     this.send('SLOT_LOAD', this.parseSlotAttributes(e))    
     let id = e.slot.getSlotId().getId()
     this.addTimerToSlot(id, "timeSinceSlotLoad")
@@ -314,7 +314,7 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
    * @param {Event} e
    */
   onSlotVisibilityChanged (e) {
-    nrvideo.Log.debug('onSlotVisibilityChanged', e)
+    Log.debug('onSlotVisibilityChanged', e)
     if (e && e.slot) {
       let id = e.slot.getSlotId().getId()
       let slotState = this.getSlotState(id)
@@ -343,7 +343,7 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
    * @param {Event} e
    */
   onSlotRequested (e) {
-    nrvideo.Log.debug('onSlotRequested', e)
+    Log.debug('onSlotRequested', e)
     this.send('SLOT_REQUESTED', this.parseSlotAttributes(e))
     let id = e.slot.getSlotId().getId()
     this.addTimerToSlot(id, "timeSinceSlotRequested")
@@ -354,7 +354,7 @@ export default class GooglePublisherTagTracker extends nrvideo.Tracker {
    * @param {Event} e
    */
   onSlotResponseReceived (e) {
-    nrvideo.Log.debug('onSlotResponseReceived', e)
+    Log.debug('onSlotResponseReceived', e)
     this.send('SLOT_RECEIVED', this.parseSlotAttributes(e))
     let id = e.slot.getSlotId().getId()
     this.addTimerToSlot(id, "timeSinceSlotReceived")

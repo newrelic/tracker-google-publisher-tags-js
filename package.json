@@ -1,35 +1,31 @@
 {
   "name": "newrelic-google-publisher-tag",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "description": "New relic tracker for GPT",
   "main": "src/index.js",
   "scripts": {
-    "build": "webpack -p",
+    "build": "webpack --mode production",
     "build:dev": "webpack --mode development",
-    "watch": "webpack -p --progress --color --watch",
-    "watch:dev": "webpack --progress --color --watch",
+    "watch": "webpack --mode production --progress --color --watch",
+    "watch:dev": "webpack --mode development --progress --color --watch",
     "prezip": "npm run build",
-    "zip": "zip -P newrelic -x '*.DS_Store' 'agent.js' '*.map' -r gpt.zip dist samples README.md CHANGELOG.md EULA.md",
+    "zip": "zip -P newrelic -x '*.DS_Store' 'agent.js' '*.map' -r gpt.zip dist samples README.md EULA.md",
     "clean": "rm -rf dist *.zip"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git@source.datanerd.us:video/google-publisher-tag-js.git"
   },
   "author": "Jordi Aguilar",
   "contributors": [
     "Andreu Santarén Llop"
   ],
-  "license": "MIT",
+  "license": "Apache-2.0",
   "dependencies": {
     "newrelic-video-core": "github:newrelic/video-core-js"
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.27.2",
     "babel-core": "^6.26.3",
-    "babel-loader": "^7.1.5",
-    "babel-preset-env": "^1.7.0",
-    "videojs-ima": "^0.6.0",
-    "webpack": "^5.34.0",
-    "webpack-cli": "^4.6.0"
+    "babel-loader": "^10.0.0",
+    "webpack": "^5.99.9",
+    "webpack-cli": "^6.0.1",
+    "videojs-ima": "^2.3.0"
   }
 }
