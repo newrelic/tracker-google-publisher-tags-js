@@ -1,6 +1,6 @@
 {
   "name": "newrelic-google-publisher-tag",
-  "version": "0.10.0",
+  "version": "0.12.0",
   "description": "New relic tracker for GPT",
   "main": "src/index.js",
   "scripts": {
@@ -18,7 +18,7 @@
   ],
   "license": "Apache-2.0",
   "dependencies": {
-    "newrelic-video-core": "github:newrelic/video-core-js"
+    "newrelic-tracker-core": "github:newrelic/tracker-core-js#0.1.0"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.27.2",

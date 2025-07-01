@@ -38,7 +38,7 @@ To initialize the tracker, call method `init()` right after `enableServices()`:
 ...
 googletag.enableServices()
 
-let tracker = nrvideo.GooglePublisherTagTracker.init()
+let tracker = nrgpt.GooglePublisherTagTracker.init()
 ```
 
 After having initialized the tracker, you can optionally select the targeting keys you want to be captured and sent over:

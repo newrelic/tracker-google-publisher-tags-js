@@ -9,7 +9,7 @@
     ],
     "globals": {
         "newrelic": true,
-        "nrvideo": true,
+        "nrgpt": true,
         "googletag": true
     }
 }
