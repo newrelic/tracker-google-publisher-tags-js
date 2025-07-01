@@ -59,9 +59,15 @@ tracker.setVisibilityTriggerLevel(10)
 
 ## Data Model
 
-### Actions
+The following event names are sent by the tracker as Browser Agent custom events, 
+with event type `GooglePublisherTagsEvent`. To view the data, open NROne and run the following
+NRQL request:
 
-The following event names are sent by the tracker as Browser Agent `Custom Events`.
+```sql
+FROM GooglePublisherTagsEvent SELECT *
+```
+
+### Actions
 
 | Action Name | Description | GPT Event |
 |---|---|---|
