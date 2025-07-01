@@ -12,7 +12,7 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, './dist'),
     filename: pkg.name + '.min.js',
-    library: 'nrvideo',
+    library: 'nrgpt',
     libraryTarget: 'umd'
   },
   devtool: 'source-map',

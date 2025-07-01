@@ -1,4 +1,7 @@
+import { Core } from 'newrelic-tracker-core'
 import { GooglePublisherTagTracker } from './tracker'
+
+Core.setEventType("GooglePublisherTagsEvent")
 
 document.addEventListener('readystatechange', (event) => {
     if (document.readyState === 'complete') {
@@ -12,5 +15,5 @@ if (window.addEventListener) {
     window.attachEvent('onload', GooglePublisherTagTracker.init)
 }
 
-export * from 'newrelic-video-core'
+export * from 'newrelic-tracker-core'
 export { GooglePublisherTagTracker }

@@ -1,4 +1,4 @@
-import { Core, Tracker, Chrono, Log } from 'newrelic-video-core'
+import { Core, Tracker, Chrono, Log } from 'newrelic-tracker-core'
 import pkg from '../package.json'
 
 export class GooglePublisherTagTracker extends Tracker {
