@@ -30,7 +30,7 @@ export class GooglePublisherTagTracker extends Tracker {
     this.reset()
 
     //TODO: move this functionality to _slotAttributes
-    this.slots = {}
+    this.slots = Object.create(null)
   }
 
   /** Resets all flags and chronos. */
@@ -51,13 +51,13 @@ export class GooglePublisherTagTracker extends Tracker {
      * Slot specific attributes.
      * @private
      */
-    this._slotAttributes = {}
+    this._slotAttributes = Object.create(null)
 
     /**
      * Time since last SLOT_HIDDEN event in milliseconds, by slot.
      * @private
      */
-    this._timeSinceLastSlotHiddenBySlot = {}
+    this._timeSinceLastSlotHiddenBySlot = Object.create(null)
   }
 
   /**
@@ -127,7 +127,7 @@ export class GooglePublisherTagTracker extends Tracker {
    * Obtain targeting options.
    */
   parseTargetingKeys () {
-    let dict = {}
+    let dict = Object.create(null)
     let keys = this._targetingKeys
     if (keys.length == 0) {
       keys = googletag.pubads().getTargetingKeys()
@@ -235,7 +235,7 @@ export class GooglePublisherTagTracker extends Tracker {
     let crono = new Chrono()
     crono.start()
     if (this._slotAttributes[slotId] == undefined) {
-      this._slotAttributes[slotId] = {}
+      this._slotAttributes[slotId] = Object.create(null)
     }
     this._slotAttributes[slotId][timerName] = crono
   }
